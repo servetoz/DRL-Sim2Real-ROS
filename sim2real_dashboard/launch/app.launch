@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+    <include file="$(find ur5_moveit_config)/launch/demo_with_websocket.launch"/>
+    <arg name="training_config_folder" default="$(find sim2real_training)/src/configs"/>
+    <arg name="sim2real_config_folder" default="$(find sim2real_training)/src/Sim2Real/config_data"/>
+    
+    <node name="sim2real_dashboard_app" pkg="sim2real_dashboard" type="app_node.py" output="screen" respawn="true">
+        <param name="dev_mode" value="true"/>
+        <param name="training_config_folder" value="$(arg training_config_folder)"/>
+        <param name="sim2real_config_folder" value="$(arg sim2real_config_folder)"/>
+    </node>
+
+</launch>

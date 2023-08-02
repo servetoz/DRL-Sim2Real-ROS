@@ -1,0 +1,131 @@
+env:
+  gravity:
+  - 0
+  - 0
+  - -9.8
+  max_steps_per_episode: 1024
+  normalize_observations: false
+  normalize_rewards: false
+  robots:
+  - config:
+      base_orientation:
+      - 0
+      - 0
+      - 0
+      base_position:
+      - 0
+      - -0.12
+      - 0.5
+      control_mode: 0
+      name: ur5_1
+      resting_angles:
+      - 0
+      - 90
+      - -30
+      - -120
+      - -80
+      - 90
+      self_collision: false
+    goal:
+      config:
+        add_to_logging: true
+        continue_after_success: true
+        dist_threshold_end: 0.01
+        dist_threshold_increment_end: 0.001
+        dist_threshold_increment_start: 0.01
+        dist_threshold_overwrite: None
+        dist_threshold_start: 0.2
+        reward_collision: -5
+        reward_distance_mult: -0.01
+        reward_success: 10
+      type: PositionCollision
+    sensors:
+    - config:
+        add_to_logging: true
+        add_to_observation_space: true
+        indicator: true
+        indicator_buckets: 6
+        ray_end: 0.3
+        ray_setup:
+          ee_forward:
+          - 1
+          - 1
+          upper_arm:
+          - 10
+          - 10
+          wrist1_circle:
+          - 10
+          - 10
+          wrist2_circle:
+          - 10
+          - 10
+          wrist3_circle:
+          - 10
+          - 10
+        ray_start: 0
+        update_steps: 1
+      type: LidarSensorUR5
+    type: UR5
+  sim_step: 0.00416666666
+  sim_steps_per_env_step: 1
+  stat_buffer_size: 25
+  use_physics_sim: true
+  world:
+    config:
+      box_measurements:
+      - 0.025
+      - 0.075
+      - 0.025
+      - 0.075
+      - 0.00075
+      - 0.00125
+      moving_obstacles_trajectory_length:
+      - 0.05
+      - 0.75
+      moving_obstacles_vels:
+      - 0.5
+      - 2
+      num_moving_obstacles: 1
+      num_static_obstacles: 3
+      sphere_measurements:
+      - 0.005
+      - 0.02
+      workspace_boundaries:
+      - -0.4
+      - 0.4
+      - 0.3
+      - 0.7
+      - 0.2
+      - 0.5
+    type: RandomObstacle
+run:
+  algorithm:
+    custom_policy:
+      activation_function: ReLU
+      policy_function:
+      - 256
+      - 256
+      - 256
+      - 256
+      value_function:
+      - 256
+      - 256
+      - 256
+      - 256
+    load_model: true
+    model_path: ''
+    type: PPO
+  eval:
+    display_delay: 0.00416666666
+    logging: 1
+    max_episodes: -1
+    show_goal_aux: true
+    show_sensor_aux: false
+    show_world_aux: true
+  train:
+    logging: 0
+    num_envs: 16
+    save_folder: ./models/weights
+    save_freq: 30000
+    save_name: randomobstacles_default
+    timesteps: 15000000

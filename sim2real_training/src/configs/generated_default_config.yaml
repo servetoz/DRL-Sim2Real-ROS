@@ -1,0 +1,165 @@
+env:
+  gravity:
+  - 0
+  - 0
+  - -9.8
+  max_steps_per_episode: 1024
+  normalize_observations: false
+  normalize_rewards: false
+  robots:
+  - config:
+      base_orientation:
+      - 0
+      - 0
+      - 0
+      base_position:
+      - 0
+      - 0
+      - 1.1
+      control_mode: 0
+      name: ur5_1
+      resting_angles:
+      - -180
+      - -45
+      - -90
+      - -135
+      - 90
+      - 0
+    goal:
+      config:
+        add_to_logging: true
+        continue_after_success: true
+        dist_threshold_end: 0.01
+        dist_threshold_increment_end: 0.001
+        dist_threshold_increment_start: 0.01
+        dist_threshold_overwrite: None
+        dist_threshold_start: 0.2
+        reward_collision: -5
+        reward_distance_mult: -0.01
+        reward_success: 10
+      type: PositionCollision
+    sensors:
+    - config:
+        add_to_logging: true
+        add_to_observation_space: true
+        indicator: true
+        indicator_buckets: 6
+        ray_end: 0.3
+        ray_setup:
+          ee_link: 10
+        ray_start: 0
+        update_steps: 1
+      type: LidarSensorGeneric
+    type: UR5
+  sim_step: 0.00416666666
+  sim_steps_per_env_step: 1
+  stat_buffer_size: 25
+  use_physics_sim: true
+  world:
+    config:
+      obstacles:
+      - params:
+          cols: 5
+          element_size: 0.5
+          rows: 5
+          shelf_depth: 0.5
+          wall_thickness: 0.01
+        position:
+        - -1.25
+        - -1
+        - 0
+        rotation:
+        - 90
+        - 0
+        - 0
+        type: shelf
+      - params:
+          cols: 5
+          element_size: 0.5
+          move:
+          - - -2.5
+            - 0.5
+            - 1.4
+          - - 2.5
+            - 0.5
+            - 1.4
+          rows: 5
+          shelf_depth: 0.5
+          vel: 10
+          wall_thickness: 0.01
+        position:
+        - -1.25
+        - 1.5
+        - 0
+        rotation:
+        - 90
+        - 0
+        - 0
+        scale: 1
+        type: shelf
+      - params:
+          move:
+          - - -2.5
+            - 0.5
+            - 1.4
+          - - 2.5
+            - 0.5
+            - 1.4
+        position:
+        - 5
+        - 5
+        - 0
+        rotation:
+        - 0
+        - 0
+        - 0
+        scale: 1
+        type: human
+      - params:
+          cols: 5
+          connector_height: 0.1
+          connector_probability: 0.7
+          connector_strict: false
+          difficulty: 1
+          element_depth: 0.5
+          element_size: 0.5
+          rows: 5
+          wall_thickness: 0.01
+        position:
+        - 10
+        - 10
+        - 0
+        rotation:
+        - 0
+        - 0
+        - 0
+        type: maze
+      workspace_boundaries:
+      - -2
+      - 2
+      - -2
+      - 2
+      - 0
+      - 5
+    type: Generated
+run:
+  algorithm:
+    gamma: 0.99
+    learning_rate: 0.0003
+    load_model: false
+    model_path: ''
+    type: PPO
+  eval:
+    display_delay: 0.00416666666
+    logging: 1
+    max_episodes: -1
+    show_goal_aux: true
+    show_sensor_aux: true
+    show_world_aux: true
+  train:
+    logging: 0
+    num_envs: 16
+    save_folder: ./models/weights
+    save_freq: 30000
+    save_name: generated_default
+    timesteps: 15000000

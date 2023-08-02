@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="sim2real_dashboard_app" pkg="sim2real_dashboard" type="app_node.py" output="screen" respawn="true">
+        <param name="dev_mode" value="true"/>
+    </node>
+</launch>
