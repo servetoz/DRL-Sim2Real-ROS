@@ -27,3 +27,12 @@ window.addEventListener('locationchange', function () {
 });
 
 window.studioRenderable = window.location.pathname === '/3d-viewer';
+
+
+$(document).ready(function () {
+    $(document).on('click', '.column-header-name', function () {
+        ev = document.createEvent('MouseEvents');
+        ev.initEvent('click', true, true);
+        $(this).parent().find('input[name="column-select-csv-datatable"')[0].dispatchEvent(ev);
+    });
+});

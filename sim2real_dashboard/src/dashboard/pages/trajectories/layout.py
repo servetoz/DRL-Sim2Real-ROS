@@ -6,11 +6,13 @@ from dash import dcc
 from dash_color_picker import ColorPicker
 from dash import dash_table
 
+from pages import GetPages
 from utils.load_csv import load_csv_data
 from pages.trajectories import colors, csv_filepaths, csv_options, fig
 from pages.trajectories.callbacks import *
 
-dash.register_page(__name__, path="/trajectories", title="Trajectories")
+dash.register_page(
+    __name__, path=GetPages.TRAJECTORIES["href"], title=GetPages.TRAJECTORIES["title"])
 
 
 def layout() -> html.Div:

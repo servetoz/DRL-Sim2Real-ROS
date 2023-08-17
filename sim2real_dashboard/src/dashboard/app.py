@@ -12,7 +12,9 @@ sys.path.append(os.path.dirname(__file__))
 
 def sim2real_dashboard(DEV_MODE, TRAINING_CONFIG_FOLDER, SIM2REAL_CONFIG_FOLDER) -> dash.Dash:
     assets_path = os.path.join(os.path.dirname(__file__), "assets")
-    external_js = []
+    external_js = [
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js'
+    ]
     if DEV_MODE:
         external_js.append("http://localhost:8080/studio-main.js")
 
@@ -103,15 +105,9 @@ def sim2real_dashboard(DEV_MODE, TRAINING_CONFIG_FOLDER, SIM2REAL_CONFIG_FOLDER)
 </html>"""
     app.layout = serve_layout
 
-    # @app.server.after_request
-    # def add_header(response):
-    #     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    #     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-    #     return response
-
     app.sim2real_config_folder = SIM2REAL_CONFIG_FOLDER
     app.training_config_folder = TRAINING_CONFIG_FOLDER
-    
+
     from api import config_file_list
 
     return app

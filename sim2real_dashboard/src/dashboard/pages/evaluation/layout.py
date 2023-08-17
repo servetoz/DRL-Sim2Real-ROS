@@ -6,8 +6,10 @@ from dash import html, dcc
 
 from pages.evaluation import colors, RRT_array, PRM_array, steps_DRL, steps_RRT, steps_PRM, distance_obst_DRL, distance_obst_RRT, distance_obst_PRM, DRL_array, planning, execution
 from pages.evaluation.callbacks import *
+from pages import GetPages
 
-dash.register_page(__name__, path="/", title="Evaluation")
+dash.register_page(
+    __name__, path=GetPages.EVALUATION["href"], title=GetPages.EVALUATION["title"])
 
 
 def layout() -> html.Div:

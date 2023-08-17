@@ -1,6 +1,7 @@
 
 import os
 
+
 class GetPages():
     EVALUATION: dict = {
         "title": "Evaluation",
@@ -18,10 +19,14 @@ class GetPages():
         "title": "3D Viewer",
         "href": "/3d-viewer",
     }
+    GRAPH_PLOTTER: dict = {
+        "title": "Graph Plotter",
+        "href": "/graph-plotter",
+    }
 
     @property
     def list(self):
-        return [self.EVALUATION, self.TRAJECTORIES, self.TRAJECTORY_3D]
+        return [self.EVALUATION, self.TRAJECTORIES, self.TRAJECTORY_3D, self.GRAPH_PLOTTER]
 
 
 def get_data_folder():
@@ -34,6 +39,7 @@ def get_csv_folder():
 
 def get_3d_trajectory_folder():
     return os.path.join(get_data_folder(), "trajectory_3d")
+
 
 def get_rosbags_folder():
     return os.path.join(get_data_folder(), "rosbags")

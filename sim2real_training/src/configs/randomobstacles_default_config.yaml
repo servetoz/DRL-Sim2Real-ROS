@@ -112,7 +112,7 @@ run:
       - 256
       - 256
       - 256
-    load_model: true
+    load_model: false
     model_path: ''
     type: PPO
   eval:

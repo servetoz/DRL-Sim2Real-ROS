@@ -7,8 +7,10 @@ from dash import dash_table
 
 from pages.trajectory_3d import fig, x, update_table_data_and_highlight_active_waypoint
 from pages.trajectory_3d.callbacks import *
+from pages import GetPages
 
-dash.register_page(__name__, path="/3d-trajectory", title="Trajectory 3D")
+dash.register_page(
+    __name__, path=GetPages.TRAJECTORY_3D["href"], title=GetPages.TRAJECTORY_3D["title"])
 
 
 def layout() -> html.Div:
