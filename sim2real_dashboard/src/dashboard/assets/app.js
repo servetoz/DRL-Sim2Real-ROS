@@ -33,6 +33,6 @@ $(document).ready(function () {
     $(document).on('click', '.column-header-name', function () {
         ev = document.createEvent('MouseEvents');
         ev.initEvent('click', true, true);
-        $(this).parent().find('input[name="column-select-csv-datatable"')[0].dispatchEvent(ev);
+        $(this).parent().find('input[type="checkbox"')[0].dispatchEvent(ev);
     });
 });

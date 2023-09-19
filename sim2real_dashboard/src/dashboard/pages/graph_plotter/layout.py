@@ -30,9 +30,9 @@ def layout() -> html.Div:
                                     [
                                         dbc.Tab(tab_csv_upload(), id="tab-csv-upload", tab_id="tab-0",
                                                 label="Upload CSV"),
-                                        dbc.Tab(tab_select_graph_type(), id="tab-graph-type", tab_id="tab-1",
+                                        dbc.Tab(tab_select_graph_type(), id="tab-graph-type", tab_id="tab-1", disabled=True,
                                                 label="Graph Type"),
-                                        dbc.Tab(tab_select_csv_columns(), id="tab-csv-columns", tab_id="tab-2",
+                                        dbc.Tab(tab_select_csv_columns(), id="tab-csv-columns", tab_id="tab-2", disabled=True,
                                                 label="CSV Columns"),
                                     ],
                                     id="graph-plotter-tabs",
@@ -43,7 +43,20 @@ def layout() -> html.Div:
                     )
                 ]),
             ]),
-        ])
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.H3("Graphs", className="d-none", id="graph-section-title"),
+                        dbc.Accordion(
+                            [],
+                            start_collapsed=False,
+                            always_open=True,
+                            id="graph-accordion",
+                        )
+                    ], id="graph-section", className="mt-5 mb-5"),
+                ]),
+            ]),
+        ]),
     ], className="dash-graph-page")
 
 
@@ -58,6 +71,7 @@ def tab_csv_upload() -> html.Div:
                     'Drag and Drop or ',
                     html.A('Select Files')
                 ]),
+                multiple=True
             ),
             html.Div(id='output-data-upload'),
         ]),
@@ -85,6 +99,23 @@ def tab_select_graph_type() -> html.Div:
                                 html.H5("Bar")
                             ],
                             id="btn-graph-type-bar",
+                            color="primary",
+                            className="mr-1 btn-graph-type",
+                            outline=True,
+                        ),
+                    ], className="text-center"),
+                    dbc.Col([
+                        dbc.Button(
+                            [
+                                html.Img(
+                                    src=dash.get_asset_url(
+                                        'img/line-chart.svg'),
+                                    height="80px",
+                                    width="80px"
+                                ),
+                                html.H5("Line")
+                            ],
+                            id="btn-graph-type-line",
                             color="primary",
                             className="mr-1 btn-graph-type",
                             outline=True,
@@ -135,7 +166,7 @@ def tab_select_csv_columns() -> html.Div:
     return html.Div([
         html.Div(
             [
-                html.H5("Select CSV Columns"),
+                html.H5("Select Arguments & CSV Columns"),
                 dbc.Button([
                     html.I(className="fas fa-bolt"),
                     html.Span("Plot", className="ms-2")
@@ -144,6 +175,7 @@ def tab_select_csv_columns() -> html.Div:
             className="mt-3 d-flex justify-content-between align-items-center"
         ),
         html.Br(),
+        html.Div("", id="arguments-section"),
         html.Div("", id="csv-table"),
     ],
         className="mt-3"
