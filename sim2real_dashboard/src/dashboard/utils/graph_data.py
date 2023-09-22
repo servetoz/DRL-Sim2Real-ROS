@@ -79,6 +79,10 @@ class CalculationMethod(Enum):
     LAST_ROW = 3
     MAX = 4
     MIN = 5
+    
+class Scaling(Enum):
+    DOWN = 0
+    UP = 1
 
 
 class GraphArguments:
@@ -87,12 +91,14 @@ class GraphArguments:
         data_sets: Dict[str, Union[str, List[Episode]]],
         episode_average: bool,
         calculation_method: CalculationMethod,
-        suc_col_tout: bool
+        suc_col_tout: bool,
+        scaling: Scaling
     ):
         self.data_sets = data_sets
         self.episode_average = episode_average
         self.calculation_method = calculation_method
         self.suc_col_tout = suc_col_tout
+        self.scaling = scaling
 
 
 class DynamicPlot():
@@ -162,18 +168,8 @@ class DynamicPlot():
                     for ep in data_set.get("episodes"):
                         y_data += ep.data_frame[col].tolist()
 
-                    print("y_data: ", len(y_data))
-
-                    if graph_args.calculation_method == CalculationMethod.SUM:
-                        y.append(np.sum(y_data))
-                    elif graph_args.calculation_method == CalculationMethod.AVERAGE:
-                        y.append(np.mean(y_data))
-                    elif graph_args.calculation_method == CalculationMethod.LAST_ROW:
-                        y.append(y_data[-1])
-                    elif graph_args.calculation_method == CalculationMethod.MAX:
-                        y.append(np.max(y_data))
-                    elif graph_args.calculation_method == CalculationMethod.MIN:
-                        y.append(np.min(y_data))
+                    y.append(self._calculate_graph_val_by_method(y_data, graph_args))
+                    
             return go.Figure(data=[go.Bar(x=x, y=y)])
 
         if graph_args.suc_col_tout:
@@ -185,7 +181,51 @@ class DynamicPlot():
         pass
 
     def _plot_radar(self, graph_args: GraphArguments):
-        pass
+        data_sets = graph_args.data_sets
+        plot_data = []
+        for data_set in data_sets:
+            x = []
+            y = []
+            for col in self.selected_columns[str(data_set.get("source_index"))]:
+                x.append("<b>" + str(col) + "</b>" + " - " + data_set.get("title"))
+                y_data = []
+                for ep in data_set.get("episodes"):
+                    y_data += ep.data_frame[col].tolist()
+
+                y.append(self._calculate_graph_val_by_method(y_data, graph_args))
+            # print("before scaling: ", y)
+            if graph_args.scaling == Scaling.DOWN:
+                min_val = min(y)
+                if min_val == 0:
+                    min_val = 1e-10
+                for i in range(len(y)):
+                    scaling_factor = y[i] / min_val
+                    pow = len(str(scaling_factor).split(".")[0])
+                    if y[i] == min_val or pow < 2:
+                        continue
+                    y[i] = y[i] * (10**(-pow))
+            elif graph_args.scaling == Scaling.UP:
+                max_val = max(y)
+                for i in range(len(y)):
+                    if y[i] == 0:
+                        scaling_factor = max_val / 1e-10
+                    else:  
+                        scaling_factor = max_val / y[i]
+                    pow = len(str(scaling_factor).split(".")[0])
+                    if y[i] == max_val or pow < 2:
+                        continue
+                    y[i] = y[i] * (10**(pow))
+            # print("after scaling: ", y)
+                        
+            plot_data.append(go.Scatterpolar(
+                r=y,
+                theta=x,
+                fill='toself',
+                name=data_set.get("title")
+            ))
+                
+        return go.Figure(data=plot_data)
+            
 
     def _plot_trajectory(self, graph_args: GraphArguments):
         fig = go.Figure()
@@ -287,6 +327,17 @@ class DynamicPlot():
                                         yref="paper"))
         return figure
 
+    def _calculate_graph_val_by_method(self, y_data: list, graph_args: GraphArguments) -> float:
+        if graph_args.calculation_method == CalculationMethod.SUM:
+            return np.sum(y_data)
+        elif graph_args.calculation_method == CalculationMethod.AVERAGE:
+            return np.mean(y_data)
+        elif graph_args.calculation_method == CalculationMethod.LAST_ROW:
+            return y_data[-1]
+        elif graph_args.calculation_method == CalculationMethod.MAX:
+            return np.max(y_data)
+        elif graph_args.calculation_method == CalculationMethod.MIN:
+            return np.min(y_data)
 
 def csv_row_to_vector(str_vector: str) -> List[float]:
     if str_vector is None or str_vector == "" or str_vector.count("[") != 1:

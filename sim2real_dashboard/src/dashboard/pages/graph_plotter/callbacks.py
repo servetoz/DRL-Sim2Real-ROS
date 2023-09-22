@@ -10,7 +10,7 @@ from dash.exceptions import PreventUpdate
 from dash import dash_table
 import dash_bootstrap_components as dbc
 
-from utils.graph_data import DataSource, CSVFile, CalculationMethod, ChartType, DynamicPlot, GraphArguments, csv_row_to_vector
+from utils.graph_data import DataSource, CSVFile, CalculationMethod, ChartType, DynamicPlot, GraphArguments, Scaling, csv_row_to_vector
 
 app = dash.get_app()
 
@@ -326,8 +326,8 @@ def render_plot_arguments(data):
                 dbc.Col(
                     dbc.RadioItems(
                         options=[
-                            {"label": "Down", "value": 0},
                             {"label": "Up", "value": 1},
+                            {"label": "Down", "value": 0},
                         ],
                         id="arg-radar-scaling",
                         value=0,
@@ -448,10 +448,11 @@ def disable_csv_table(suc_col_tout):
     State("suc-col-tout", "value"),
     State("arg-ep-avg", "value"),
     State("arg-calculation", "value"),
+    State("arg-radar-scaling", "value"),
     ####
     prevent_initial_call=True
 )
-def plot_csv(btn_plot_csv, children, btn_delete_plot, episodes_selection, suc_col_tout, episode_average, calculation_method):
+def plot_csv(btn_plot_csv, children, btn_delete_plot, episodes_selection, suc_col_tout, episode_average, calculation_method, scaling):
     if get_dynamic_plot() is None:
         return dash.no_update
 
@@ -483,7 +484,8 @@ def plot_csv(btn_plot_csv, children, btn_delete_plot, episodes_selection, suc_co
         episodes_selection=episodes_selection,
         episode_average=episode_average,
         calculation_method=CalculationMethod(calculation_method),
-        suc_col_tout=suc_col_tout
+        suc_col_tout=suc_col_tout,
+        scaling=Scaling(scaling)
     )
     graph = get_dynamic_plot().plot_data(graph_args)
     children = [
@@ -516,7 +518,8 @@ def parse_plot_arguments(
         episodes_selection: List[List[str]],
         episode_average: bool,
         calculation_method: CalculationMethod,
-        suc_col_tout: bool
+        suc_col_tout: bool,
+        scaling: Scaling,
 ):
     data_sources = get_data_sources()
     data_sets = []
@@ -543,7 +546,8 @@ def parse_plot_arguments(
         data_sets=data_sets,
         episode_average=episode_average,
         calculation_method=calculation_method,
-        suc_col_tout=suc_col_tout
+        suc_col_tout=suc_col_tout,
+        scaling=scaling
     )
 
 
