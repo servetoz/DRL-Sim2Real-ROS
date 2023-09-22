@@ -193,10 +193,10 @@ def get_csv_table(data_source_index: int, row_count=100, load_more_n_clicks=1):
         data = data[:np.min([len(data), row_count])]
 
     selectable = data_source.get_data().columns
-    if get_dynamic_plot().chart_type == ChartType.BAR:
-        selectable = get_selectable_columns_for_bar(data_source)
+    if get_dynamic_plot().chart_type in [ChartType.BAR, ChartType.RADAR, ChartType.LINE]:
+        selectable = get_scalar_columns(data_source)
     elif get_dynamic_plot().chart_type == ChartType.TRAJECTORY:
-        selectable = get_selectable_columns_for_3d(data_source)
+        selectable = get_vector_columns(data_source)
 
     return html.Div(
         [
@@ -322,6 +322,24 @@ def render_plot_arguments(data):
         ),
         dbc.Row(
             [
+                dbc.Label("Auto Scaling:", html_for="arg-radar-scaling", width=3),
+                dbc.Col(
+                    dbc.RadioItems(
+                        options=[
+                            {"label": "Down", "value": 0},
+                            {"label": "Up", "value": 1},
+                        ],
+                        id="arg-radar-scaling",
+                        value=0,
+                    ),
+                    width=9,
+                    className="flex-wrap align-items-center d-flex"
+                ),
+            ],
+            className="mb-3" + "" if get_dynamic_plot().chart_type == ChartType.RADAR else "d-none",
+        ),
+        dbc.Row(
+            [
                 dbc.Label("Success & Collision & Timeout:",
                           width=3, html_for="suc-col-tout"),
                 dbc.Col(
@@ -383,7 +401,7 @@ def episodes_dropdown_interaction(options, val, search_val):
     return val, options
 
 
-def get_selectable_columns_for_bar(data_source: DataSource):
+def get_scalar_columns(data_source: DataSource):
     columns = data_source.columns
     columns = [column for column in columns if column not in [
         'episodes', 'steps']]
@@ -393,7 +411,7 @@ def get_selectable_columns_for_bar(data_source: DataSource):
     return columns_scalar
 
 
-def get_selectable_columns_for_3d(data_source: DataSource):
+def get_vector_columns(data_source: DataSource):
     columns = data_source.columns
     columns = [
         column for column in columns if column not in ['episodes', 'steps']
