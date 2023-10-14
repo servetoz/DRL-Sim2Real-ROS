@@ -19,8 +19,9 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SaveIcon from '@mui/icons-material/Save';
 import PlayCircleFilledWhiteIcon from '@mui/icons-material/PlayCircleFilledWhite';
 import StopIcon from '@mui/icons-material/Stop';
+import PauseIcon from '@mui/icons-material/Pause';
 import TreeItem from '@mui/lab/TreeItem';
-import { Alert, Backdrop, Button, CircularProgress, MenuItem, Select, SelectChangeEvent, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Backdrop, Button, CircularProgress, MenuItem, Select, SelectChangeEvent, Snackbar, TextField, Typography, keyframes } from "@mui/material";
 
 import EmptyState from "@foxglove/studio-base/components/EmptyState";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
@@ -36,8 +37,24 @@ const API_FETCH_FILE = "/api/sim2real/config/:type/:name";
 const API_TRAINING_START = "/api/sim2real/training/start/:name";
 const API_TRAINIG_STATUS = "/api/sim2real/training/status";
 const API_TRAINIG_STOP = "/api/sim2real/training/stop";
+const API_TRAINIG_PAUSE = "/api/sim2real/training/pause";
+const API_TRAINIG_RESUME = "/api/sim2real/training/resume";
 
 export type AlertColor = 'success' | 'info' | 'warning' | 'error';
+
+type TrainingStatus = "running" | "finished" | "paused" | "finished_with_error" | "stopped";
+
+const pulse = keyframes`
+0% {
+  opacity: 1;
+}
+  50% {
+  opacity: 0.1;
+}
+100% {
+  opacity: 1;
+}
+`
 
 const useStyles = makeStyles()((theme) => ({
   inputWrapper: {
@@ -74,6 +91,9 @@ const useStyles = makeStyles()((theme) => ({
         width: "100%",
       },
     },
+  },
+  pulse: {
+    animation: `${pulse} 1.2s infinite`,
   },
   startAdornment: {
     display: "flex",
@@ -203,6 +223,7 @@ function ConfigEditorPanel() {
   let fileContentKeys = [] as string[];
   const [snackbarOptions, setSnackbarOptions] = useState({ message: "", severity: "success", open: false, autoHideDuration: 3000 } as { message: string, severity: string, open: boolean, autoHideDuration: number | null });
   const [trainingStatusInterval, setTrainingStatusInterval] = useState<any>(null);
+  const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>();
 
 
   const onFileChange = useCallback(
@@ -300,6 +321,7 @@ function ConfigEditorPanel() {
 
       startTraining(name).then((data) => {
         console.log(data);
+        setTrainingStatus("running");
       });
 
       const trainingStatus = async () => {
@@ -320,9 +342,11 @@ function ConfigEditorPanel() {
             clearInterval(trainingStatusInterval);
             setTrainingStatusInterval(null);
             setSnackbarOptions({ message: "Training finished succesfully!", severity: "success", open: true, autoHideDuration: null });
+            setTrainingStatus("finished");
           } else if (data.status === "finished_with_error") {
             clearInterval(trainingStatusInterval);
             setTrainingStatusInterval(null);
+            setTrainingStatus("finished_with_error");
             setSnackbarOptions({ message: "Training finished with error! Please check ros logs for more information.", severity: "error", open: true, autoHideDuration: null });
           }
         });
@@ -359,15 +383,63 @@ function ConfigEditorPanel() {
           clearInterval(trainingStatusInterval);
           setTrainingStatusInterval(null);
           setSnackbarOptions({ message: "Training stopped!", severity: "success", open: true, autoHideDuration: null });
+          setTrainingStatus("stopped");
         }
       }).catch((err) => {
         setSnackbarOptions({ message: "Error stopping training!", severity: "error", open: true, autoHideDuration: null });
         console.log(err);
       });
 
-    }, [trainingStatusInterval, setTrainingStatusInterval, setSnackbarOptions]);
+    }, [trainingStatusInterval, setTrainingStatusInterval, setSnackbarOptions, setTrainingStatus]);
 
 
+  const onPauseTraining = useCallback(
+    () => {
+      const pauseTraining = async () => {
+        const url = API_TRAINIG_PAUSE;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((res) => res.json());
+        return response;
+      }
+
+      pauseTraining().then((data) => {
+        if (data.status === "paused") {
+          setSnackbarOptions({ message: "Training paused!", severity: "success", open: true, autoHideDuration: 2000 });
+          setTrainingStatus("paused");
+        }
+      }).catch((err) => {
+        setSnackbarOptions({ message: "Error pausing training!", severity: "error", open: true, autoHideDuration: 2000 });
+        console.log(err);
+      });
+    }, [trainingStatusInterval, setTrainingStatusInterval, setTrainingStatus]);
+
+  const onResumeTraining = useCallback(
+    () => {
+      const resumeTraining = async () => {
+        const url = API_TRAINIG_RESUME;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((res) => res.json());
+        return response;
+      }
+
+      resumeTraining().then((data) => {
+        if (data.status === "running") {
+          setTrainingStatus("running");
+          setSnackbarOptions({ message: "Training resumed!", severity: "success", open: true, autoHideDuration: 2000 });
+        }
+      }).catch((err) => {
+        setSnackbarOptions({ message: "Error resuming training!", severity: "error", open: true, autoHideDuration: 2000 });
+        console.log(err);
+      });
+    }, [trainingStatus, setTrainingStatus]);
 
   const renderTree = (nodes: any) => {
     if (typeof nodes !== "object" || nodes === null) {
@@ -452,7 +524,7 @@ function ConfigEditorPanel() {
       <Stack flex="auto" overflow="hidden" position="relative">
         <PanelToolbar>
           <div className={classes.inputWrapper}>
-            <ConfigFileList onChange={onFileChange} />
+            <ConfigFileList onChange={onFileChange} disabled={trainingStatus === "running" || trainingStatus === "paused"} />
           </div>
         </PanelToolbar>
         {!selectedFile && <EmptyState>No file selected</EmptyState>}
@@ -483,7 +555,7 @@ function ConfigEditorPanel() {
             onClick={onFileSave}>
             Save
           </Button>
-          {selectedFile.type === "training" && trainingStatusInterval === null &&
+          {selectedFile.type === "training" && trainingStatus != "running" && trainingStatus != "paused" &&
             (
               <Button
                 variant="outlined"
@@ -492,15 +564,43 @@ function ConfigEditorPanel() {
                 Execute
               </Button>
             )}
-          {selectedFile.type === "training" && trainingStatusInterval !== null &&
+          {selectedFile.type === "training" && trainingStatus == "running" &&
             (
-              <Button
-                variant="outlined"
-                startIcon={<StopIcon />}
-                color="error"
-                onClick={onTrainingStop}>
-                Stop (Running...)
-              </Button>
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<PauseIcon />}
+                  color="warning"
+                  onClick={onPauseTraining}>
+                  Pause
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<StopIcon />}
+                  color="error"
+                  onClick={onTrainingStop}>
+                  Stop
+                </Button>
+              </>
+            )}
+          {selectedFile.type === "training" && trainingStatus == "paused" &&
+            (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<PauseIcon className={classes.pulse} />}
+                  color="warning"
+                  onClick={onResumeTraining}>
+                  Resume
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<StopIcon />}
+                  color="error"
+                  onClick={onTrainingStop}>
+                  Stop
+                </Button>
+              </>
             )}
         </Stack >)
       }

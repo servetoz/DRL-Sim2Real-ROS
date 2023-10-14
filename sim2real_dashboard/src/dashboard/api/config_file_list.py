@@ -4,6 +4,7 @@ from flask import request
 import yaml
 from sim2real_training.training import start_training
 import multiprocessing as mp
+import psutil
 
 app = dash.get_app()
 
@@ -91,6 +92,28 @@ def api_stop_training():
         'status': 'stopped'
     }
 
+
+@app.server.route('/api/sim2real/training/pause')
+def api_pause_training():
+    if app.training_process is not None:
+        process_id = app.training_process.pid
+        proc = psutil.Process(process_id)
+        proc.suspend()
+
+    return {
+        'status': 'paused'
+    }
+    
+@app.server.route('/api/sim2real/training/resume')
+def api_resume_training():
+    if app.training_process is not None:
+        process_id = app.training_process.pid
+        proc = psutil.Process(process_id)
+        proc.resume()
+
+    return {
+        'status': 'running'
+    }
 
 @app.server.route('/api/sim2real/training/status')
 def api_training_status():

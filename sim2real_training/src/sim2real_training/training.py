@@ -11,7 +11,7 @@ def start_training(config_file):
     print(
         "TRAINING STARTED with config file: {}".format(config_file))
 
-    for i in range(5):
+    for i in range(50):
         print("TRAINING RUNNING: {}".format(i))
         time.sleep(1)
 
@@ -20,3 +20,4 @@ def start_training(config_file):
     print(
         "TRAINING FINISHED")
     sys.exit(0)
+    

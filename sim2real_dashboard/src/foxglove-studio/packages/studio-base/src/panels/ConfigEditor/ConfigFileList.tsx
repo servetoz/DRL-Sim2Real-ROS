@@ -115,6 +115,7 @@ export default React.memo<ConfigFileListProps>(function ConfigFileList(
                 <CircularProgress color="inherit" />
             </Backdrop>
             <Autocomplete
+                disabled={props.disabled}
                 onChange={(_event, value) => props.onChange(value?.name, value?.type)}
                 options={configFiles}
                 freeSolo
