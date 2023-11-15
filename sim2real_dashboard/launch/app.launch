@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find ur5_moveit_config)/launch/demo_with_websocket.launch"/>
+    <arg name="rviz" default="false"/>
+    <include file="$(find ur5_moveit_config)/launch/demo_with_websocket.launch">
+        <arg name="open_rviz" value="$(arg rviz)"/>
+    </include>
     <arg name="training_config_folder" default="$(find sim2real_training)/src/configs"/>
     <arg name="sim2real_config_folder" default="$(find sim2real_training)/src/Sim2Real/config_data"/>
     
