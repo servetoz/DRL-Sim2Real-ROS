@@ -90,6 +90,7 @@ import {
 import { SelectEntry } from "./settings";
 import { AddTransformResult, CoordinateFrame, Transform, TransformTree } from "./transforms";
 import { InterfaceMode } from "./types";
+import { SceneEditor } from "./renderables/SceneEditor";
 
 const log = Logger.getLogger(__filename);
 
@@ -322,6 +323,7 @@ export class Renderer extends EventEmitter<RendererEvents> implements IRenderer 
       case "3d":
         this.cameraHandler = new CameraStateSettings(this, this.#canvas, aspect);
         this.#addSceneExtension(this.cameraHandler);
+        this.#addSceneExtension(new SceneEditor(this));
         this.#addSceneExtension(new PublishSettings(this));
         this.#addSceneExtension(new Images(this));
         this.#addSceneExtension(new Cameras(this));

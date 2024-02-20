@@ -115,6 +115,22 @@
   </transmission>
   <!-- links: main serial chain -->
   <link name="base_link"/>
+  <!-- <link name="base_link">
+    <visual>
+      <origin rpy="0 0 3.141592653589793" xyz="1 1 1"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+  </link> -->
   <link name="base_link_inertia">
     <visual>
       <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>

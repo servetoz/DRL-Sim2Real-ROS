@@ -107,8 +107,9 @@ def sim2real_dashboard(DEV_MODE, TRAINING_CONFIG_FOLDER, SIM2REAL_CONFIG_FOLDER)
 
     app.sim2real_config_folder = SIM2REAL_CONFIG_FOLDER
     app.training_config_folder = TRAINING_CONFIG_FOLDER
+    app.assets_folder = assets_path
 
-    from api import config_file_list
+    from api import config_file_list, urdf_editor
 
     return app
 

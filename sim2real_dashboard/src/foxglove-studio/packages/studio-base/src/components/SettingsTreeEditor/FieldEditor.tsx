@@ -6,6 +6,12 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import ErrorIcon from "@mui/icons-material/Error";
 import {
   Autocomplete,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   MenuItem,
   MenuList,
   MenuListProps,
@@ -195,6 +201,43 @@ function FieldInput({
             actionHandler({ action: "update", payload: { path, input: "number", value } })
           }
         />
+      );
+    case "button":
+      return (
+        <Button fullWidth variant="contained" onClick={field.handler} disabled={field.disabled}>
+          <Typography variant="button">{field.value}</Typography>
+        </Button>
+      );
+    case "dialog":
+      return (
+        <Dialog
+          open={field.isOpen}
+          onClose={field.onClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {field.title}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {field.message}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            {field.dialogActions && field.dialogActions.map((action) => (
+              <Button
+                key={action.label}
+                onClick={action.handler}
+                color={action.color}
+                variant={action.variant}
+                autoFocus={action.autoFocus}
+              >
+                {action.label}
+              </Button>
+            ))}
+          </DialogActions>
+        </Dialog>
       );
     case "toggle":
       return (

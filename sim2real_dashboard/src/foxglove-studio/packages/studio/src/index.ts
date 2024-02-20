@@ -495,7 +495,8 @@ export type SettingsIcon =
   | "Timeline"
   | "Topic"
   | "Walk"
-  | "World";
+  | "World"
+  | "Cylinder";
 
 /**
  * A settings tree field specifies the input type and the value of a field
@@ -561,6 +562,27 @@ export type SettingsTreeFieldValue =
        * Optional placeholder text displayed in the field input when value is undefined
        */
       placeholder?: string;
+    }
+  | {
+      input: "button";
+      value?: string;
+      handler: () => void;
+  }
+  | {
+      input: "dialog";
+      value?: string;
+      isOpen: boolean;
+      onOpen?: () => void;
+      onClose?: () => void;
+      message: string;
+      title: string;
+      dialogActions?: {
+        label: string;
+        color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning',
+        variant?: "text" | "outlined" | "contained";
+        autoFocus?: boolean;
+        handler: () => void;
+      }[];
     }
   | {
       input: "select";

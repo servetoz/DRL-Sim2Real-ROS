@@ -40,6 +40,7 @@ import Expand from "@mui/icons-material/UnfoldMore";
 import Cells from "@mui/icons-material/ViewComfy";
 import Cube from "@mui/icons-material/ViewInAr";
 import ImageProjection from "@mui/icons-material/Vrpano";
+import Cylinder from '@mui/icons-material/Crop169';
 
 import { SettingsIcon } from "@foxglove/studio";
 
@@ -82,6 +83,7 @@ const icons: Record<SettingsIcon, typeof Add> = {
   Topic,
   Walk,
   World,
+  Cylinder,
 };
 
 export { icons };

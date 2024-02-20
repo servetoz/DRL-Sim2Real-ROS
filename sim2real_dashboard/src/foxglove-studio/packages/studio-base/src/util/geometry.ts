@@ -28,6 +28,38 @@ export function eulerToQuaternion(rpy: Vector3): Quaternion {
   return { x, y, z, w };
 }
 
+export type Euler = {
+  roll: number;
+  pitch: number;
+  yaw: number;
+};
+
+/**
+ * Converts a quaternion to a Euler roll, pitch, yaw representation, in degrees.
+ *
+ * @param quaternion Input quaternion.
+ * @returns Converted Euler angle roll, pitch, yaw representation, in degrees.
+ */
+export function quaternionToEuler(quaternion: Quaternion): Euler {
+  const { x, y, z, w } = quaternion;
+
+  const toDegrees = 180 / Math.PI;
+  const dcm00 = w * w + x * x - y * y - z * z;
+  const dcm10 = 2 * (x * y + w * z);
+  const dcm20 = 2 * (x * z - w * y);
+  const dcm21 = 2 * (w * x + y * z);
+  const dcm22 = w * w - x * x - y * y + z * z;
+  const roll = toDegrees * Math.atan2(dcm21, dcm22);
+  const pitch = toDegrees * Math.asin(-dcm20);
+  const yaw = toDegrees * Math.atan2(dcm10, dcm00);
+  return {
+    roll,
+    pitch,
+    yaw,
+  };
+}
+
+
 export function makeCovarianceArray(xDev: number, yDev: number, thetaDev: number): number[] {
   const covariance = Array(36).fill(0);
   covariance[6 * 0 + 0] = Math.pow(xDev, 2);
